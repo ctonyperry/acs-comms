@@ -4,19 +4,19 @@ import logging
 from functools import lru_cache
 
 from .models.state import CallState
-from .services import ACSClient, MediaStreamer, VoskSTTService, CompositeTTSService
+from .services import ACSClient, CompositeTTSService, MediaStreamer, VoskSTTService
 from .settings import Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
 
-@lru_cache()
+@lru_cache
 def get_call_state() -> CallState:
     """Get singleton call state instance."""
     return CallState()
 
 
-@lru_cache()
+@lru_cache
 def get_acs_client(settings: Settings = None) -> ACSClient:
     """Get ACS client instance.
     
@@ -28,11 +28,11 @@ def get_acs_client(settings: Settings = None) -> ACSClient:
     """
     if settings is None:
         settings = get_settings()
-        
+
     return ACSClient(settings.acs_connection_string)
 
 
-@lru_cache() 
+@lru_cache
 def get_stt_service(settings: Settings = None) -> VoskSTTService:
     """Get STT service instance.
     
@@ -44,11 +44,11 @@ def get_stt_service(settings: Settings = None) -> VoskSTTService:
     """
     if settings is None:
         settings = get_settings()
-        
+
     return VoskSTTService(model_path=settings.stt_model_path)
 
 
-@lru_cache()
+@lru_cache
 def get_tts_service(settings: Settings = None) -> CompositeTTSService:
     """Get TTS service instance.
     
@@ -60,7 +60,7 @@ def get_tts_service(settings: Settings = None) -> CompositeTTSService:
     """
     if settings is None:
         settings = get_settings()
-    
+
     return CompositeTTSService(
         piper_voice_path=settings.piper_voice_path,
         piper_length_scale=settings.piper_length_scale,
@@ -70,7 +70,7 @@ def get_tts_service(settings: Settings = None) -> CompositeTTSService:
     )
 
 
-@lru_cache()
+@lru_cache
 def get_media_streamer(
     stt_service: VoskSTTService = None,
     tts_service: CompositeTTSService = None
@@ -88,7 +88,7 @@ def get_media_streamer(
         stt_service = get_stt_service()
     if tts_service is None:
         tts_service = get_tts_service()
-        
+
     return MediaStreamer(stt_service, tts_service)
 
 
@@ -99,7 +99,7 @@ def get_settings_dependency() -> Settings:
 
 
 def get_call_state_dependency() -> CallState:
-    """FastAPI dependency for call state.""" 
+    """FastAPI dependency for call state."""
     return get_call_state()
 
 

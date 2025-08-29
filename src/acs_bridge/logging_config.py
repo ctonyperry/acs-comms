@@ -1,10 +1,10 @@
 """Logging configuration for ACS Bridge application."""
 
 import logging.config
-from typing import Dict, Any
+from typing import Any
 
 
-def get_logging_config() -> Dict[str, Any]:
+def get_logging_config() -> dict[str, Any]:
     """Get logging configuration dictionary."""
     return {
         "version": 1,
@@ -27,7 +27,7 @@ def get_logging_config() -> Dict[str, Any]:
                 "stream": "ext://sys.stdout",
             },
             "detailed_console": {
-                "class": "logging.StreamHandler", 
+                "class": "logging.StreamHandler",
                 "level": "DEBUG",
                 "formatter": "detailed",
                 "stream": "ext://sys.stdout",
@@ -45,7 +45,7 @@ def get_logging_config() -> Dict[str, Any]:
                 "propagate": False,
             },
             "acs_bridge.services.tts_pyttsx3": {
-                "level": "INFO", 
+                "level": "INFO",
                 "handlers": ["console"],
                 "propagate": False,
             },
@@ -61,7 +61,7 @@ def get_logging_config() -> Dict[str, Any]:
             },
             "uvicorn.access": {
                 "level": "INFO",
-                "handlers": ["console"], 
+                "handlers": ["console"],
                 "propagate": False,
             },
         },
@@ -75,7 +75,7 @@ def get_logging_config() -> Dict[str, Any]:
 def setup_logging() -> None:
     """Configure logging for the application."""
     logging.config.dictConfig(get_logging_config())
-    
+
     # Get logger for this module
     logger = logging.getLogger(__name__)
     logger.info("Logging configuration initialized")
