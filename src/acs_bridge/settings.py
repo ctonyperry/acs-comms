@@ -66,6 +66,56 @@ class Settings(BaseSettings):
         description="Piper pause between sentences in seconds"
     )
 
+    # Ollama LLM settings
+    ollama_base_url: str = Field(
+        default="http://localhost:11434",
+        alias="OLLAMA_BASE_URL",
+        description="Base URL for Ollama API server"
+    )
+
+    ollama_model: str = Field(
+        default="llama3.2",
+        alias="OLLAMA_MODEL",
+        description="Ollama model name to use for generation"
+    )
+
+    ollama_temperature: float = Field(
+        default=0.7,
+        alias="OLLAMA_TEMPERATURE",
+        description="Temperature for text generation (0.0-1.0)"
+    )
+
+    ollama_top_p: float = Field(
+        default=0.9,
+        alias="OLLAMA_TOP_P",
+        description="Top-p (nucleus) sampling parameter (0.0-1.0)"
+    )
+
+    ollama_seed: int | None = Field(
+        default=None,
+        alias="OLLAMA_SEED",
+        description="Random seed for reproducible generation"
+    )
+
+    ollama_max_tokens: int = Field(
+        default=2048,
+        alias="OLLAMA_MAX_TOKENS",
+        description="Maximum number of tokens to generate"
+    )
+
+    ollama_stop: list[str] = Field(
+        default_factory=lambda: ["\n\n", "Human:", "User:"],
+        alias="OLLAMA_STOP",
+        description="Stop sequences to end generation"
+    )
+
+    # Persona configuration path
+    persona_config_path: str = Field(
+        default="./config/persona.yaml",
+        alias="PERSONA_CONFIG_PATH",
+        description="Path to persona configuration YAML file"
+    )
+
     @field_validator("acs_connection_string")
     @classmethod
     def validate_acs_connection_string(cls, v: str) -> str:
