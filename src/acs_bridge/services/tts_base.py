@@ -31,14 +31,14 @@ class BaseTTSService(ABC):
     @abstractmethod
     def is_available(self) -> bool:
         """Check if TTS service is available."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     async def synthesize(self, text: str, voice_id: str | None = None, rate: int = 180) -> Path:
         """Synthesize text to speech."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     async def list_voices(self) -> list[VoiceInfo]:
         """List available voices."""
-        pass
+        raise NotImplementedError

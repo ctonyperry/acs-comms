@@ -41,14 +41,14 @@ class BaseSTTService(ABC):
     @abstractmethod
     async def start_processing(self, transcript_queue: asyncio.Queue[str]) -> None:
         """Start STT processing."""
-        pass
+        raise NotImplementedError
         
     @abstractmethod  
     async def process_audio_chunk(self, audio_data: bytes) -> None:
         """Process audio chunk."""
-        pass
+        raise NotImplementedError
         
     @abstractmethod
     async def stop_processing(self) -> None:
         """Stop processing."""
-        pass
+        raise NotImplementedError

@@ -106,7 +106,25 @@ class Pyttsx3TTSService(BaseTTSService):
             raise RuntimeError("pyttsx3 not installed. Run: pip install pyttsx3")
 
         voices_data = await asyncio.to_thread(self._list_voices_sync)
-        return [VoiceInfo(**voice) for voice in voices_data]
+        
+        # Convert raw voice data to VoiceInfo objects, handling list languages
+        voice_list = []
+        for voice_data in voices_data:
+            # Handle languages field - convert list to string if needed
+            lang = voice_data.get("lang")
+            if isinstance(lang, list) and lang:
+                lang = lang[0]  # Take first language
+            elif not isinstance(lang, str):
+                lang = None
+                
+            voice_info = VoiceInfo(
+                id=voice_data["id"],
+                name=voice_data["name"],
+                lang=lang
+            )
+            voice_list.append(voice_info)
+            
+        return voice_list
 
     def _list_voices_sync(self) -> list[dict]:
         """Synchronous voice listing with COM initialization."""
