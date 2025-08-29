@@ -7,7 +7,7 @@ from .llm_ollama import OllamaLLMService
 __all__ = [
     "Guardrails",
     "LLM",
-    "LLMUnavailable", 
+    "LLMUnavailable",
     "Message",
     "assemble_messages",
     "OllamaLLMService",
