@@ -117,7 +117,6 @@ def crossfade_wav_files(wav_files: List[Union[str, Path]],
         # If only one file, just return it (or copy if output_path specified)
         if len(wav_files) == 1:
             if output_path:
-                import shutil
                 shutil.copy2(str(wav_files[0]), str(output_path))
                 return str(output_path)
             return str(wav_files[0])
