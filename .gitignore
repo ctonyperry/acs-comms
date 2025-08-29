@@ -2,7 +2,7 @@
 __pycache__/
 *.pyc
 .env
-models/
+vosk-models/
 *.wav
 
 # Build artifacts
