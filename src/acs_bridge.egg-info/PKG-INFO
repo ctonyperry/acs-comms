@@ -1,0 +1,28 @@
+Metadata-Version: 2.4
+Name: acs-bridge
+Version: 1.0.0
+Summary: Azure Communication Services bidirectional audio bridge
+Author: ACS Bridge Team
+License: MIT
+Requires-Python: >=3.10
+Requires-Dist: fastapi>=0.104.1
+Requires-Dist: uvicorn[standard]>=0.24.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: sounddevice>=0.4.6
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: azure-communication-callautomation>=1.1.0
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: pydantic-settings>=2.1.0
+Provides-Extra: stt
+Requires-Dist: vosk>=0.3.45; extra == "stt"
+Provides-Extra: tts
+Requires-Dist: pyttsx3>=2.90; extra == "tts"
+Requires-Dist: pywin32>=306; sys_platform == "win32" and extra == "tts"
+Provides-Extra: dev
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.7.0; extra == "dev"
+Requires-Dist: pytest>=7.4.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.12.0; extra == "dev"
+Requires-Dist: pre-commit>=3.5.0; extra == "dev"

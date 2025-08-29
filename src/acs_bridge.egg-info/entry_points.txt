@@ -1,0 +1,2 @@
+[console_scripts]
+acs-bridge = acs_bridge.main:main
