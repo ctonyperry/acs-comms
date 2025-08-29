@@ -146,10 +146,12 @@ class Settings(BaseSettings):
         return None
         
     @field_validator("ollama_stop", mode="before")
-    @classmethod
+    @classmethod  
     def validate_ollama_stop(cls, v) -> List[str]:
         """Parse comma-separated stop sequences."""
-        if isinstance(v, str):
+        if v is None:
+            return []
+        elif isinstance(v, str):
             return parse_comma_separated_list(v)
         elif isinstance(v, list):
             return v

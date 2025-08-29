@@ -92,15 +92,16 @@ class TestOllamaLLMStreaming:
         ]
         
         mock_response = MockResponse(content_lines=content_lines)
-        mock_session = AsyncMock()
+        mock_session = MagicMock()
         mock_session.post.return_value = mock_response
         
         llm = OllamaLLM(settings, session=mock_session)
         messages = [{"role": "user", "content": "test"}]
         
         # Collect chunks
+        response = await llm.generate(messages, stream=True)
         chunks = []
-        async for chunk in llm.generate(messages, stream=True):
+        async for chunk in response:
             chunks.append(chunk)
             
         # Should only get text before STOP
@@ -113,17 +114,13 @@ class TestOllamaLLMStreaming:
         # First call returns 502, second succeeds
         call_count = 0
         
-        async def mock_post(*args, **kwargs):
+        def mock_post(*args, **kwargs):
             nonlocal call_count
             call_count += 1
             
             if call_count == 1:
                 # First call: 502 error
-                mock_resp = MagicMock()
-                mock_resp.status = 502
-                mock_resp.request_info = MagicMock()
-                mock_resp.history = []
-                
+                mock_resp = MockResponse(status=502)
                 raise aiohttp.ClientResponseError(
                     request_info=mock_resp.request_info,
                     history=mock_resp.history,
@@ -134,15 +131,16 @@ class TestOllamaLLMStreaming:
                 content_lines = ['{"response": "success"}', '{"done": true}']
                 return MockResponse(content_lines=content_lines)
         
-        mock_session = AsyncMock()
-        mock_session.post = mock_post
+        mock_session = MagicMock()
+        mock_session.post.side_effect = mock_post
         
         llm = OllamaLLM(settings, session=mock_session)
         messages = [{"role": "user", "content": "test"}]
         
         # Should succeed after retry
+        response = await llm.generate(messages, stream=True)
         chunks = []
-        async for chunk in llm.generate(messages, stream=True):
+        async for chunk in response:
             chunks.append(chunk)
             
         assert chunks == ["success"]
@@ -152,29 +150,26 @@ class TestOllamaLLMStreaming:
         """Test LLMUnavailable exception after repeated failures."""
         settings = MockSettings()
         
-        async def mock_post(*args, **kwargs):
+        def mock_post(*args, **kwargs):
             # Always return 502 error
-            mock_resp = MagicMock()
-            mock_resp.status = 502
-            mock_resp.request_info = MagicMock()
-            mock_resp.history = []
-            
+            mock_resp = MockResponse(status=502)
             raise aiohttp.ClientResponseError(
                 request_info=mock_resp.request_info,
                 history=mock_resp.history,
                 status=502
             )
         
-        mock_session = AsyncMock()
-        mock_session.post = mock_post
+        mock_session = MagicMock()
+        mock_session.post.side_effect = mock_post
         
         llm = OllamaLLM(settings, session=mock_session)
         messages = [{"role": "user", "content": "test"}]
         
         # Should raise LLMUnavailable after max retries
         with pytest.raises(LLMUnavailable, match="unavailable after 3 retries"):
+            response = await llm.generate(messages, stream=True)
             chunks = []
-            async for chunk in llm.generate(messages, stream=True):
+            async for chunk in response:
                 chunks.append(chunk)
                 
     async def test_empty_chunks_filtered(self):
@@ -191,15 +186,16 @@ class TestOllamaLLMStreaming:
         ]
         
         mock_response = MockResponse(content_lines=content_lines)
-        mock_session = AsyncMock()
+        mock_session = MagicMock()
         mock_session.post.return_value = mock_response
         
         llm = OllamaLLM(settings, session=mock_session)
         messages = [{"role": "user", "content": "test"}]
         
         # Collect chunks
+        response = await llm.generate(messages, stream=True)
         chunks = []
-        async for chunk in llm.generate(messages, stream=True):
+        async for chunk in response:
             chunks.append(chunk)
             
         # Should only get non-empty chunks
@@ -216,7 +212,7 @@ class TestOllamaLLMStreaming:
         ]
         
         mock_response = MockResponse(content_lines=content_lines)
-        mock_session = AsyncMock()
+        mock_session = MagicMock()
         mock_session.post.return_value = mock_response
         
         llm = OllamaLLM(settings, session=mock_session)
@@ -238,7 +234,7 @@ class TestOllamaLLMStreaming:
         ]
         
         mock_response = MockResponse(content_lines=content_lines)
-        mock_session = AsyncMock()
+        mock_session = MagicMock()
         mock_session.post.return_value = mock_response
         
         llm = OllamaLLM(settings, session=mock_session)
@@ -263,7 +259,7 @@ class TestOllamaLLMStreaming:
         """Test async context manager properly cleans up session."""
         settings = MockSettings()
         
-        mock_session = AsyncMock()
+        mock_session = MagicMock()
         mock_session.close = AsyncMock()
         
         async with OllamaLLM(settings) as llm:
