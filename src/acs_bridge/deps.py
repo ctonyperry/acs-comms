@@ -4,7 +4,7 @@ import logging
 from functools import lru_cache
 
 from .models.state import CallState
-from .services import ACSClient, MediaStreamer, VoskSTTService, Pyttsx3TTSService
+from .services import ACSClient, MediaStreamer, VoskSTTService, CompositeTTSService
 from .settings import Settings, get_settings
 
 logger = logging.getLogger(__name__)
@@ -49,19 +49,31 @@ def get_stt_service(settings: Settings = None) -> VoskSTTService:
 
 
 @lru_cache()
-def get_tts_service() -> Pyttsx3TTSService:
+def get_tts_service(settings: Settings = None) -> CompositeTTSService:
     """Get TTS service instance.
     
+    Args:
+        settings: Application settings (injected)
+    
     Returns:
-        TTS service instance
+        Composite TTS service instance (Piper + pyttsx3 fallback)
     """
-    return Pyttsx3TTSService()
+    if settings is None:
+        settings = get_settings()
+    
+    return CompositeTTSService(
+        piper_voice_path=settings.piper_voice_path,
+        piper_length_scale=settings.piper_length_scale,
+        piper_noise_scale=settings.piper_noise_scale,
+        piper_noise_w=settings.piper_noise_w,
+        piper_sentence_silence=settings.piper_sentence_silence
+    )
 
 
 @lru_cache()
 def get_media_streamer(
     stt_service: VoskSTTService = None,
-    tts_service: Pyttsx3TTSService = None
+    tts_service: CompositeTTSService = None
 ) -> MediaStreamer:
     """Get media streamer instance.
     
@@ -101,6 +113,6 @@ def get_media_streamer_dependency() -> MediaStreamer:
     return get_media_streamer()
 
 
-def get_tts_service_dependency() -> Pyttsx3TTSService:
+def get_tts_service_dependency() -> CompositeTTSService:
     """FastAPI dependency for TTS service."""
     return get_tts_service()

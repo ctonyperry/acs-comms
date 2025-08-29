@@ -1,6 +1,11 @@
 .venv
-__pychache__
+__pycache__/
 *.pyc
 .env
 models/
 *.wav
+
+# Build artifacts
+*.egg-info/
+dist/
+build/

@@ -24,7 +24,7 @@ from ..models.schemas import (
 from ..models.state import CallState
 from ..services.acs_client import ACSClient
 from ..services.media_streamer import MediaStreamer
-from ..services.tts_pyttsx3 import Pyttsx3TTSService
+from ..services.tts_composite import CompositeTTSService
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ async def api_play(
 
 @router.get("/voices", response_model=VoicesResponse)
 async def api_voices(
-    tts_service: Pyttsx3TTSService = Depends(get_tts_service_dependency),
+    tts_service: CompositeTTSService = Depends(get_tts_service_dependency),
 ) -> VoicesResponse:
     """List available TTS voices.
     
@@ -118,7 +118,7 @@ async def api_voices(
     if not tts_service.is_available:
         raise HTTPException(
             status_code=501, 
-            detail="pyttsx3 not installed (pip install pyttsx3)"
+            detail="No TTS service available (install piper and/or pyttsx3)"
         )
         
     try:
@@ -130,7 +130,7 @@ async def api_voices(
         logger.error(f"Voice enumeration failed: {e}")
         raise HTTPException(
             status_code=500,
-            detail=f"pyttsx3 voice enumeration failed: {e}"
+            detail=f"TTS voice enumeration failed: {e}"
         )
 
 
@@ -139,7 +139,7 @@ async def api_say(
     payload: Dict[str, Any] = Body(...),
     call_state: CallState = Depends(get_call_state_dependency),
     media_streamer: MediaStreamer = Depends(get_media_streamer_dependency),
-    tts_service: Pyttsx3TTSService = Depends(get_tts_service_dependency),
+    tts_service: CompositeTTSService = Depends(get_tts_service_dependency),
 ) -> SayResponse:
     """Synthesize text to speech and play to caller.
     
@@ -161,7 +161,7 @@ async def api_say(
     if not tts_service.is_available:
         raise HTTPException(
             status_code=501,
-            detail="pyttsx3 not installed (pip install pyttsx3)"
+            detail="No TTS service available (install piper and/or pyttsx3)"
         )
         
     # Extract parameters

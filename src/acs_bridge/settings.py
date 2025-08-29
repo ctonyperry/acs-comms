@@ -36,6 +36,37 @@ class Settings(BaseSettings):
         description="Path to Vosk STT model directory"
     )
     
+    # Piper TTS settings
+    piper_voice_path: Optional[str] = Field(
+        default="./voices/en-us-high.onnx",
+        alias="PIPER_VOICE_PATH",
+        description="Path to Piper voice model (.onnx file)"
+    )
+    
+    piper_length_scale: float = Field(
+        default=1.08,
+        alias="PIPER_LENGTH_SCALE",
+        description="Piper speech speed multiplier (1.0 = normal, >1.0 = slower)"
+    )
+    
+    piper_noise_scale: float = Field(
+        default=0.65,
+        alias="PIPER_NOISE_SCALE", 
+        description="Piper speech variability (0.0-1.0, higher = more variable)"
+    )
+    
+    piper_noise_w: float = Field(
+        default=0.80,
+        alias="PIPER_NOISE_W",
+        description="Piper variance in speech timing (0.0-1.0)"
+    )
+    
+    piper_sentence_silence: float = Field(
+        default=0.25,
+        alias="PIPER_SENTENCE_SILENCE",
+        description="Piper pause between sentences in seconds"
+    )
+    
     @field_validator("acs_connection_string")
     @classmethod
     def validate_acs_connection_string(cls, v: str) -> str:
