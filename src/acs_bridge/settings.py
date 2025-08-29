@@ -1,9 +1,9 @@
 """Application settings management using Pydantic."""
 
 import os
-from typing import Optional
+from typing import Optional, List
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -67,6 +67,56 @@ class Settings(BaseSettings):
         description="Piper pause between sentences in seconds"
     )
     
+    # Ollama LLM settings
+    ollama_base_url: AnyHttpUrl = Field(
+        default="http://localhost:11434",
+        alias="OLLAMA_BASE_URL",
+        description="Ollama server base URL"
+    )
+    
+    ollama_model: str = Field(
+        default="llama3.1:8b",
+        alias="OLLAMA_MODEL",
+        description="Ollama model name"
+    )
+    
+    ollama_temperature: float = Field(
+        default=0.4,
+        alias="OLLAMA_TEMPERATURE",
+        description="LLM temperature (0.0-1.0, higher = more random)"
+    )
+    
+    ollama_top_p: float = Field(
+        default=0.9,
+        alias="OLLAMA_TOP_P", 
+        description="LLM top-p sampling (0.0-1.0)"
+    )
+    
+    ollama_seed: Optional[int] = Field(
+        default=None,
+        alias="OLLAMA_SEED",
+        description="LLM random seed for reproducible outputs"
+    )
+    
+    ollama_max_tokens: int = Field(
+        default=512,
+        alias="OLLAMA_MAX_TOKENS",
+        description="Maximum tokens to generate"
+    )
+    
+    ollama_stop: List[str] = Field(
+        default_factory=list,
+        alias="OLLAMA_STOP",
+        description="Stop sequences for generation (comma-separated in env)"
+    )
+    
+    # Persona configuration
+    persona_path: str = Field(
+        default="config/persona.yaml",
+        alias="PERSONA_PATH",
+        description="Path to persona configuration YAML file"
+    )
+    
     @field_validator("acs_connection_string")
     @classmethod
     def validate_acs_connection_string(cls, v: str) -> str:
@@ -94,8 +144,25 @@ class Settings(BaseSettings):
                 return None
             return path
         return None
+        
+    @field_validator("ollama_stop", mode="before")
+    @classmethod
+    def validate_ollama_stop(cls, v) -> List[str]:
+        """Parse comma-separated stop sequences."""
+        if isinstance(v, str):
+            return parse_comma_separated_list(v)
+        elif isinstance(v, list):
+            return v
+        return []
 
 
 def get_settings() -> Settings:
     """Get application settings instance."""
     return Settings()
+
+
+def parse_comma_separated_list(value: str) -> List[str]:
+    """Parse comma-separated string into list of strings."""
+    if not value:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
