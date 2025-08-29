@@ -2,3 +2,5 @@
 __pychache__
 *.pyc
 .env
+models/
+*.wav
