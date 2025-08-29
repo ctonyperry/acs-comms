@@ -12,7 +12,7 @@ install-dev:  ## Install development dependencies
 	pip install -e ".[dev]"
 
 install-all:  ## Install all dependencies (prod + dev + optional)
-	pip install -e ".[dev,stt,tts]"
+	pip install -e ".[dev,stt,tts,llm]"
 
 fmt:  ## Format code with black
 	black src/ tests/ run.py
