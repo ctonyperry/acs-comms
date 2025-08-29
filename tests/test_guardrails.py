@@ -1,6 +1,5 @@
 """Tests for Guardrails system."""
 
-
 import pytest
 
 from src.phone_agent.services.guardrails import Guardrails

@@ -11,11 +11,11 @@ from .tts_pyttsx3 import Pyttsx3TTSService
 
 __all__ = [
     "ACSClient",
-    "MediaStreamer", 
+    "MediaStreamer",
     "STTService",
     "BaseSTTService",
     "VoskSTTService",
-    "TTSService", 
+    "TTSService",
     "BaseTTSService",
     "CompositeTTSService",
     "PiperTTSService",

@@ -26,9 +26,9 @@ def temp_dir():
 def test_wav_file(temp_dir):
     """Create a test WAV file."""
     import wave
-    
+
     wav_path = temp_dir / "test.wav"
-    
+
     # Create a simple 16kHz mono WAV file
     with wave.open(str(wav_path), "wb") as wf:
         wf.setnchannels(1)
@@ -36,7 +36,7 @@ def test_wav_file(temp_dir):
         wf.setframerate(16000)
         # Write 1 second of silence
         wf.writeframes(b"\x00\x00" * 16000)
-        
+
     return wav_path
 
 
@@ -44,20 +44,20 @@ def test_wav_file(temp_dir):
 def mock_settings():
     """Create mock settings for testing."""
     from src.acs_bridge.settings import Settings
-    
+
     # Mock environment variables
     test_env = {
         "ACS_CONNECTION_STRING": "endpoint=https://test.communication.azure.com/;accesskey=test123",
         "PUBLIC_BASE": "https://test.ngrok-free.app",
         "STT_MODEL_PATH": "",
     }
-    
+
     # Patch environment
     original_env = {}
     for key, value in test_env.items():
         original_env[key] = os.environ.get(key)
         os.environ[key] = value
-        
+
     try:
         settings = Settings()
         yield settings

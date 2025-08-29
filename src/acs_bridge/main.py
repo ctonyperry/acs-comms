@@ -20,22 +20,22 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     logger.info(f"Loaded settings - Public base: {settings.public_base}")
     logger.info(f"STT model path: {settings.stt_model_path or 'Not configured'}")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down ACS Bridge application")
 
 
 def create_app() -> FastAPI:
     """Create and configure FastAPI application.
-    
+
     Returns:
         Configured FastAPI application instance
     """
     # Setup logging first
     setup_logging()
-    
+
     # Create FastAPI app
     app = FastAPI(
         title="ACS Bridge",
@@ -43,12 +43,12 @@ def create_app() -> FastAPI:
         version="1.0.0",
         lifespan=lifespan,
     )
-    
+
     # Mount routers
     app.include_router(events_router, tags=["events"])
     app.include_router(media_ws_router, tags=["media"])
     app.include_router(controls_router, tags=["controls"])
-    
+
     logger.info("FastAPI application created and configured")
     return app
 
@@ -59,7 +59,7 @@ app = create_app()
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "acs_bridge.main:app",
         host="0.0.0.0",

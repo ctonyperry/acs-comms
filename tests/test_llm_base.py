@@ -1,6 +1,5 @@
 """Tests for LLM base protocol and utilities."""
 
-
 import pytest
 
 from src.phone_agent.services.llm_base import LLMUnavailable, Message, assemble_messages

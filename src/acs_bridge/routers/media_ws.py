@@ -23,7 +23,7 @@ async def websocket_endpoint(
     media_streamer: MediaStreamer = Depends(get_media_streamer_dependency),
 ) -> None:
     """WebSocket endpoint for bidirectional audio streaming.
-    
+
     Handles:
     - WebSocket connection lifecycle
     - Bidirectional audio streaming (mic <-> phone)
@@ -33,19 +33,17 @@ async def websocket_endpoint(
     await websocket.accept()
     call_state.ws = websocket
     logger.info("WebSocket connection established")
-    
+
     try:
         # Start media streaming
         await media_streamer.start_streaming(websocket, call_state)
-        
+
         # Main message loop
         frames_received = 0
         async for message in websocket.iter_text():
-            await _process_websocket_message(
-                message, call_state, media_streamer, frames_received
-            )
+            await _process_websocket_message(message, call_state, media_streamer, frames_received)
             frames_received += 1
-            
+
     except WebSocketDisconnect:
         logger.info("WebSocket disconnected by client")
     except Exception as e:
@@ -61,7 +59,7 @@ async def _process_websocket_message(
     frames_received: int,
 ) -> None:
     """Process a single WebSocket message.
-    
+
     Args:
         message: Raw WebSocket message
         call_state: Current call state
@@ -71,16 +69,16 @@ async def _process_websocket_message(
     try:
         data = json.loads(message)
         message_kind = (data.get("kind") or "").lower()
-        
+
         if message_kind == "audiometadata":
             logger.info(f"Audio metadata: {data}")
-            
+
         elif message_kind == "audiodata":
             await _process_audio_data(data, media_streamer, frames_received)
-            
+
         else:
             logger.debug(f"Unknown message kind: {message_kind}")
-            
+
     except json.JSONDecodeError as e:
         logger.warning(f"Invalid JSON in WebSocket message: {e}")
     except Exception as e:
@@ -93,7 +91,7 @@ async def _process_audio_data(
     frames_received: int,
 ) -> None:
     """Process audio data from WebSocket.
-    
+
     Args:
         data: Audio data message
         media_streamer: Media streaming service
@@ -101,21 +99,21 @@ async def _process_audio_data(
     """
     audio_data = data.get("audioData") or data.get("audiodata") or {}
     b64_data = audio_data.get("data")
-    
+
     if not b64_data:
         return
-        
+
     try:
         # Decode base64 audio data
         audio_bytes = base64.b64decode(b64_data)
-        
+
         # Process through media streamer
         await media_streamer.process_incoming_audio(audio_bytes)
-        
+
         # Log progress periodically
         if frames_received % 50 == 0:
             logger.debug(f"Processed {frames_received} audio frames")
-            
+
     except Exception as e:
         logger.error(f"Error processing audio data: {e}")
 
@@ -125,21 +123,21 @@ async def _cleanup_websocket_connection(
     media_streamer: MediaStreamer,
 ) -> None:
     """Cleanup WebSocket connection and associated resources.
-    
+
     Args:
         call_state: Current call state
         media_streamer: Media streaming service
     """
     logger.info("Cleaning up WebSocket connection")
-    
+
     try:
         # Stop media streaming
         await media_streamer.stop_streaming()
-        
+
         # Reset call state
         call_state.reset()
-        
+
         logger.info("WebSocket cleanup completed")
-        
+
     except Exception as e:
         logger.error(f"Error during WebSocket cleanup: {e}")
